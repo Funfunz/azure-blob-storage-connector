@@ -3,20 +3,18 @@ import { Funfunz } from '@funfunz/core'
 import type { ICreateArgs, IQueryArgs, IRemoveArgs, IUpdateArgs, DataConnector, IDataConnector } from '@funfunz/core/lib/types/connector'
 import { IAzureBlobStorageOptions } from './types'
 
+import { BlobServiceClient } from '@azure/storage-blob'
+
 const debug = Debug('funfunz:AzureBlobStorageConnector')
 
 export class Connector implements DataConnector{
   private funfunz: Funfunz
-  public connection: IAzureBlobStorageOptions
-  constructor(connector: IDataConnector, funfunz: Funfunz) {
+  public connection: BlobServiceClient
+  constructor(connector: IDataConnector<IAzureBlobStorageOptions>, funfunz: Funfunz) {
     this.funfunz = funfunz
-    this.connection = connector.config as IAzureBlobStorageOptions
+    this.connection = BlobServiceClient.fromConnectionString(connector.config.connectionString)
     debug('Start')
-    Object.keys(connector).forEach(
-      (key) => {
-        debug(key, (connector)[key])
-      }
-    )
+    debug('connectionString', connector.config.connectionString)
     debug('End')
   }
 
