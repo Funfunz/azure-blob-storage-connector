@@ -1,169 +1,36 @@
 export default {
-  'name': 'users',
-  'connector': 'mainDatabase',
-  'visible': true,
-  'roles': {
-    'create': [
-      'admin'
-    ],
-    'read': [
-      'admin'
-    ],
-    'update': [
-      'admin'
-    ],
-    'delete': [
-      'admin'
-    ]
-  },
-  'relations': [
+  name: 'files',
+  connector: 'azureBlobStorage',
+  visible: true,
+  properties: [
     {
-      'type': 'm:n',
-      'relationalTable': 'usersroles',
-      'foreignKey': 'userId',
-      'remoteTable': 'roles',
-      'remoteForeignKey': 'roleId',
-    },
-  ],
-  'properties': [
-    {
-      'name': 'id',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': true,
-        'relation': true
-      },
-      'model': {
-        'type': 'int',
-        'allowNull': false,
-        'isPk': true
-      },
-      'layout': {
-        'label': 'Id',
-        'listColumn': {},
-        'editField': {
-          'type': 'number'
-        }
-      }
+      name: 'name',
+      type: 'string',
+      isPk: true,
     },
     {
-      'name': 'email',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': true,
-        'relation': false
-      },
-      'model': {
-        'type': 'varchar(255)',
-        'allowNull': false
-      },
-      'layout': {
-        'label': 'Email',
-        'listColumn': {},
-        'editField': {
-          'type': 'text'
-        }
-      }
+      name: 'createdOn',
+      type: 'string',
+      readOnly: true,
     },
     {
-      'name': 'name',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': true,
-        'relation': false
-      },
-      'model': {
-        'type': 'varchar(255)',
-        'allowNull': true
-      },
-      'layout': {
-        'label': 'Name',
-        'listColumn': {},
-        'editField': {
-          'type': 'text'
-        }
-      }
+      name: 'lastModified',
+      type: 'string',
+      readOnly: true,
     },
     {
-      'name': 'password',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': true,
-        'relation': false
-      },
-      'model': {
-        'type': 'varchar(255)',
-        'allowNull': true
-      },
-      'layout': {
-        'label': 'Password',
-        'listColumn': {},
-        'editField': {
-          'type': 'text'
-        }
-      }
+      name: 'contentLength',
+      type: 'number',
+      readOnly: true,
     },
     {
-      'name': 'createdAt',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': false,
-        'relation': false
-      },
-      'model': {
-        'type': 'datetime',
-        'allowNull': false
-      },
-      'layout': {
-        'label': 'CreatedAt',
-        'listColumn': {},
-        'editField': {
-          'type': 'date'
-        }
-      }
+      name: 'contentType',
+      type: 'string',
+      readOnly: true,
     },
     {
-      'name': 'updatedAt',
-      'searchable': true,
-      'visible': {
-        'list': true,
-        'detail': false,
-        'relation': false
-      },
-      'model': {
-        'type': 'datetime',
-        'allowNull': false
-      },
-      'layout': {
-        'label': 'UpdatedAt',
-        'listColumn': {},
-        'editField': {
-          'type': 'date'
-        }
-      }
+      name: 'content',
+      type: 'file',
     }
-  ],
-  'hooks': {
-    count: {
-      async beforeResolver(props) {
-        throw new Error('Not authorized')
-      }
-    }
-  },
-  'layout': {
-    'label': 'Users',
-    'listPage': {},
-    'searchField': {},
-    'createButton': {},
-    'editButton': {},
-    'deleteButton': {},
-    'editPage': {
-      'sections': []
-    }
-  }
+  ]
 }

@@ -1,9 +1,10 @@
 const config = {
   connectors: {
-    mainDatabase: {
+    azureBlobStorage: {
       type: "@funfunz/azure-blob-storage-connector",
       config: {
-        connectionString: '...'
+        connectionString: process.env.CONNECTION_STRING,
+        containerName: process.env.CONTAINER_NAME
       },
     }
   }

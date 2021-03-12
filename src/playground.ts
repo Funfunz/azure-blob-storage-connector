@@ -1,4 +1,4 @@
-import { BlobServiceClient } from '@azure/storage-blob'
+import { BlobItem, BlobServiceClient } from '@azure/storage-blob'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -35,13 +35,14 @@ async function uploadBlob(containerName: string, blobName: string, content: stri
 }
 
 async function listBlobs(containerName: string) {
-  let i = 1
   const containerClient = blobServiceClient.getContainerClient(containerName)
   const blobs = containerClient.listBlobsFlat()
+  const results: BlobItem[] = []
   for await (const blob of blobs) {
-    console.log(`Blob ${i++}: ${blob.name}`)
+    results.push(blob)
   }
-  return blobs
+  console.log(results)
+  return results
 }
 
 async function downloadBlob(containerName: string, blobName: string) {
@@ -70,11 +71,11 @@ async function downloadBlob(containerName: string, blobName: string) {
 async function main() {
   //await createContainer(CONTAINER_NAME)
   //await listContainers()
-  const blobName = `blob-${new Date().getTime()}`
-  const content = 'Hello world'
+  //const blobName = `blob-${new Date().getTime()}`
+  //const content = 'Hello world'
   //await uploadBlob(CONTAINER_NAME, blobName, content)
   //listBlobs(CONTAINER_NAME)
-  downloadBlob(CONTAINER_NAME, 'blob-1615392268568')
+  //downloadBlob(CONTAINER_NAME, 'blob-1615392268568')
 }
 
 main()

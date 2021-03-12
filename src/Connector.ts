@@ -1,40 +1,82 @@
 import Debug from 'debug'
 import { Funfunz } from '@funfunz/core'
+import mime from 'mime'
+import { uuid } from 'uuidv4'
+import type { FileUpload } from 'graphql-upload'
 import type { ICreateArgs, IQueryArgs, IRemoveArgs, IUpdateArgs, DataConnector, IDataConnector } from '@funfunz/core/lib/types/connector'
-import { IAzureBlobStorageOptions } from './types'
+import { IAzureBlobStorageOptions, IBlobItem } from './types'
 
-import { BlobServiceClient } from '@azure/storage-blob'
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob'
 
 const debug = Debug('funfunz:AzureBlobStorageConnector')
 
+
 export class Connector implements DataConnector{
   private funfunz: Funfunz
-  public connection: BlobServiceClient
+  public connection: ContainerClient
   constructor(connector: IDataConnector<IAzureBlobStorageOptions>, funfunz: Funfunz) {
     this.funfunz = funfunz
-    this.connection = BlobServiceClient.fromConnectionString(connector.config.connectionString)
+    this.connection = BlobServiceClient.fromConnectionString(
+      connector.config.connectionString
+    ).getContainerClient(connector.config.containerName)
+    console.log('this.connection', this.connection)
     debug('Start')
     debug('connectionString', connector.config.connectionString)
     debug('End')
   }
 
-  public query(args: IQueryArgs): Promise<Record<string, unknown>[] | number> {
-    console.log(args)
-    return Promise.resolve([])
+  public async query(args: IQueryArgs): Promise<IBlobItem[] | number> {
+    const blobs = this.connection.listBlobsFlat()
+    const results: IBlobItem[] = []
+    for await (const blob of blobs) {
+      results.push({
+        name: blob.name,
+        createdOn: blob.properties.createdOn?.toISOString(),
+        lastModified: blob.properties.lastModified?.toISOString(),
+        contentLength: blob.properties.contentLength as number,
+        contentType: blob.properties.contentType,
+        content: `https://${this.connection.accountName}.blob.core.windows.net/${this.connection.containerName}/${blob.name}`
+      })
+    }
+    return args.count ? results.length : results
   }
 
-  public update(args: IUpdateArgs): Promise<Record<string, unknown>[] | number> {
-    console.log(args)
-    return Promise.resolve([])
+  public async update(args: IUpdateArgs): Promise<IBlobItem[] | number> {
+    const { createReadStream, mimetype } = await args.data.file as FileUpload
+    const blobsFound = await this.query({ ...args, fields: args.fields || ['name'] }) as IBlobItem[]
+    await Promise.all(blobsFound.map(({ name }) => {
+      const blobClient = this.connection.getBlockBlobClient(name)
+      return blobClient.uploadStream(createReadStream(), undefined, undefined, {
+        blobHTTPHeaders: {
+          blobContentType: mimetype
+        }
+      })
+    }))
+    return blobsFound 
   }
 
-  public create(args: ICreateArgs): Promise<Record<string, unknown>[] | Record<string, unknown> | number> {
-    console.log(args)
-    return Promise.resolve([])
+  public async create(args: ICreateArgs): Promise<IBlobItem[] | IBlobItem | number> {
+    const { createReadStream, mimetype } = await args.data.file as FileUpload
+    const blobName = `${uuid()}.${mime.getExtension(mimetype)}`
+    const blobClient = this.connection.getBlockBlobClient(blobName)
+    await blobClient.uploadStream(createReadStream(), undefined, undefined, {
+      blobHTTPHeaders: {
+        blobContentType: mimetype
+      }
+    })
+    return await this.query({
+      entityName: args.entityName,
+      fields: args.fields || ['name', 'content', 'contentType'],
+      filter: { name: { _eq: blobName }},
+    }) 
   }
 
-  public remove(args: IRemoveArgs): Promise<number> {
-    console.log(args)
-    return Promise.resolve(0)
+  public async remove(args: IRemoveArgs): Promise<number> {
+    const blobsFound = await this.query({ ...args, fields: ['name'] }) as IBlobItem[]
+    await Promise.all(blobsFound.map(({ name }) => {
+      const blobClient = this.connection.getBlockBlobClient(name)
+      return blobClient.delete()
+    }))
+    return blobsFound.length
   }
 }
