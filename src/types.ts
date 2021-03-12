@@ -7,7 +7,7 @@ export interface IBlobItem {
   name: string
   createdOn?: string
   lastModified?: string
-  contentLength: number,
+  contentLength: number
   contentType?: string
   content?: string
 }
