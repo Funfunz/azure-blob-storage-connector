@@ -25,7 +25,8 @@ export class Connector implements DataConnector{
   }
 
   public async query(args: IQueryArgs): Promise<IBlobItem[] | number> {
-    const blobs = this.connection.listBlobsFlat()
+    const prefix = (args?.filter?.name as { _eq: string })?._eq || ''
+    const blobs = this.connection.listBlobsFlat({ prefix })
     const results: IBlobItem[] = []
     for await (const blob of blobs) {
       results.push({

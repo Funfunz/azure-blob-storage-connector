@@ -38,6 +38,7 @@ async function uploadBlob(containerName: string, blobName: string, content: stri
 
 async function listBlobs(containerName: string) {
   const containerClient = blobServiceClient.getContainerClient(containerName)
+  containerClient.setAccessPolicy('blob')
   const blobs = containerClient.listBlobsFlat()
   const results: BlobItem[] = []
   for await (const blob of blobs) {
