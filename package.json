@@ -1,6 +1,6 @@
 {
   "name": "@funfunz/azure-blob-storage-connector",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "azure blob storage connector for Funfunz",
   "main": "lib/index.js",
   "scripts": {
@@ -49,7 +49,7 @@
     "@funfunz/core": "^0.16.0",
     "debug": "^4.2.0",
     "mime": "^2.5.2",
-    "uuidv4": "^6.2.6"
+    "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "@funfunz/core": "^0.7.0"
