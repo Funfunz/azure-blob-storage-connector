@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import { BlobItem, BlobServiceClient } from '@azure/storage-blob'
 import dotenv from 'dotenv'
 
