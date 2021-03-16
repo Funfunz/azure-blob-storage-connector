@@ -47,7 +47,7 @@ describe('Azure Blog Storage Connector', () => {
     connector.create({
       entityName,
       data: {
-        file: {
+        content: {
           filename,
           createReadStream: () => {
             return fs.createReadStream(`${__dirname}/${filename}`)
@@ -79,7 +79,7 @@ describe('Azure Blog Storage Connector', () => {
       },
       entityName,
       data: {
-        file: {
+        content: {
           filename,
           createReadStream: () => {
             return fs.createReadStream(`${__dirname}/${filename}`)

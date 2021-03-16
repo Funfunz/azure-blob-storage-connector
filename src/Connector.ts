@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import { Funfunz } from '@funfunz/core'
 import mime from 'mime'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 import type { FileUpload } from 'graphql-upload'
 import type { ICreateArgs, IQueryArgs, IRemoveArgs, IUpdateArgs, DataConnector, IDataConnector } from '@funfunz/core/lib/types/connector'
 import { IAzureBlobStorageOptions, IBlobItem } from './types'
@@ -19,7 +19,6 @@ export class Connector implements DataConnector{
     this.connection = BlobServiceClient.fromConnectionString(
       connector.config.connectionString
     ).getContainerClient(connector.config.containerName)
-    console.log('this.connection', this.connection)
     debug('Start')
     debug('connectionString', connector.config.connectionString)
     debug('End')
@@ -35,14 +34,14 @@ export class Connector implements DataConnector{
         lastModified: blob.properties.lastModified?.toISOString(),
         contentLength: blob.properties.contentLength as number,
         contentType: blob.properties.contentType,
-        content: `https://${this.connection.accountName}.blob.core.windows.net/${this.connection.containerName}/${blob.name}`
+        content: `${this.connection.url}/${blob.name}`
       })
     }
     return args.count ? results.length : results
   }
 
   public async update(args: IUpdateArgs): Promise<IBlobItem[] | number> {
-    const { createReadStream, mimetype } = await args.data.file as FileUpload
+    const { createReadStream, mimetype } = await args.data.content as FileUpload
     const blobsFound = await this.query({ ...args, fields: args.fields || ['name'] }) as IBlobItem[]
     await Promise.all(blobsFound.map(({ name }) => {
       const blobClient = this.connection.getBlockBlobClient(name)
@@ -56,7 +55,7 @@ export class Connector implements DataConnector{
   }
 
   public async create(args: ICreateArgs): Promise<IBlobItem[] | IBlobItem | number> {
-    const { createReadStream, mimetype } = await args.data.file as FileUpload
+    const { createReadStream, mimetype } = await args.data.content as FileUpload
     const blobName = `${uuid()}.${mime.getExtension(mimetype)}`
     const blobClient = this.connection.getBlockBlobClient(blobName)
     await blobClient.uploadStream(createReadStream(), undefined, undefined, {
