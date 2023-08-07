@@ -1,12 +1,12 @@
 import { Connector } from '../index'
 import config from './configs/MCconfig'
 import settings from './configs/MCsettings'
-import { Funfunz } from '@funfunz/core'
 import fs from 'fs'
 import dotenv from 'dotenv'
+import { Funfunz } from '@funfunz/core/lib'
 dotenv.config()
 
-jest.mock('@funfunz/core', () => {
+jest.mock('@funfunz/core/lib', () => {
   return {
     Funfunz: function ({ config: configData, settings: settingsData }) {
       return {

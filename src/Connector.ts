@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import { Funfunz } from '@funfunz/core'
 import mime from 'mime'
 import { v4 as uuid } from 'uuid'
 import type { FileUpload } from 'graphql-upload'
@@ -11,11 +10,9 @@ import { BlobServiceClient, ContainerClient } from '@azure/storage-blob'
 const debug = Debug('funfunz:AzureBlobStorageConnector')
 
 
-export class Connector implements DataConnector{
-  private funfunz: Funfunz
+export class Connector implements DataConnector {
   public connection: ContainerClient
-  constructor(connector: IDataConnector<IAzureBlobStorageOptions>, funfunz: Funfunz) {
-    this.funfunz = funfunz
+  constructor(connector: IDataConnector<IAzureBlobStorageOptions>) {
     this.connection = BlobServiceClient.fromConnectionString(
       connector.config.connectionString
     ).getContainerClient(connector.config.containerName)
