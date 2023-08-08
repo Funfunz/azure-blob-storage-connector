@@ -1,40 +1,16 @@
 import { Connector } from '../index'
-import config from './configs/MCconfig'
-import settings from './configs/MCsettings'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { Funfunz } from '@funfunz/core/lib'
 dotenv.config()
-
-jest.mock('@funfunz/core/lib', () => {
-  return {
-    Funfunz: function ({ config: configData, settings: settingsData }) {
-      return {
-        config: () => {
-          console.log(configData, settingsData)
-          return {
-            config: configData,
-            settings: settingsData
-          }
-        }
-      }
-    }
-  }
-})
-
 
 const connector = new Connector(
   {
-    type: 'azure-blob-storage',
+    connector: Connector,
     config: {
       connectionString: process.env.CONNECTION_STRING || '...',
       containerName: process.env.CONTAINER_NAME || '...'
     }
-  },
-  new Funfunz({
-    config,
-    settings: settings as any
-  })
+  }
 )
 
 const mimetype = 'image/png'

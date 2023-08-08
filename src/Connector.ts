@@ -3,7 +3,7 @@ import mime from 'mime'
 import { v4 as uuid } from 'uuid'
 import type { FileUpload } from 'graphql-upload'
 import type { ICreateArgs, IQueryArgs, IRemoveArgs, IUpdateArgs, DataConnector, IDataConnector } from '@funfunz/core/lib/types/connector'
-import { IAzureBlobStorageOptions, IBlobItem } from './types'
+import {IAzureBlobStorageOptions, IBlobItem } from './types'
 
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob'
 
@@ -12,6 +12,7 @@ const debug = Debug('funfunz:AzureBlobStorageConnector')
 
 export class Connector implements DataConnector {
   public connection: ContainerClient
+  // eslint-disable-next-line no-unused-vars
   constructor(connector: IDataConnector<IAzureBlobStorageOptions>) {
     this.connection = BlobServiceClient.fromConnectionString(
       connector.config.connectionString
